@@ -8,6 +8,7 @@ from typing import Any
 import voluptuous as vol
 
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
+from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 
@@ -15,7 +16,7 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
-# Remove authentication fields; no user data is needed
+# Remove unused authentication fields
 STEP_USER_DATA_SCHEMA = vol.Schema({})
 
 
@@ -24,7 +25,7 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     return {"title": "Sofia Transit"}
 
 
-class ConfigFlow(ConfigFlow, domain=DOMAIN):
+class SofiaTransitConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Sofia Transit."""
 
     VERSION = 1

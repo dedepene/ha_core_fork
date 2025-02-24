@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from datetime import timedelta
 import logging
+from datetime import timedelta
 from typing import Any
 
 from homeassistant.core import HomeAssistant
@@ -32,13 +32,28 @@ class SofiaTransitUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             raw_data = await async_fetch_data_from_sofiatraffic(
                 API_URL, self.session, {"stop": "1287"}
             )
-            # Transform raw API response into a dict with a "lines" list:
             lines = []
             for bus in raw_data.values():
                 details = bus.get("details", [])
                 next_bus = details[0].get("t") if details else None
-                lines.append({"line": bus.get("name"), "next_bus": next_bus})
-            print(f"lines: {lines}")
+                bus_type = bus.get("type")
+                name = bus.get("name")
+                match bus_type:
+                    case 1:
+                        prefix = "A"  # bus
+                    case 2:
+                        prefix = "TM"  # tram
+                    case 3:
+                        prefix = "M"  # metro
+                    case 4:
+                        prefix = "TB"  # trolley
+                    case 5:
+                        prefix = "N"  # night line
+                    case _:
+                        prefix = ""
+                full_line = f"{prefix}{name}" if prefix else name
+                lines.append({"line": full_line, "next_bus": next_bus})
+            _LOGGER.debug("Lines received: %s", lines)
             return {"lines": lines}
         except Exception as err:
             raise UpdateFailed(f"Error fetching data: {err}") from err

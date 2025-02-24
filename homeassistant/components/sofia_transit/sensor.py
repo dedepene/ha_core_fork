@@ -3,10 +3,12 @@ from __future__ import annotations
 from typing import Any
 
 from homeassistant.components.sensor import SensorEntity
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
+
+from .const import DOMAIN
 
 # ...existing code...
 
@@ -29,6 +31,17 @@ class SofiaTransitSensor(CoordinatorEntity, SensorEntity):
         """Return the state of the sensor: minutes until next bus."""
         data = self.coordinator.data
         # Expected data structure: {"lines": [{"line": "1", "next_bus": 3}, ...]}
+        if not data:
+            return None
+        for line in data.get("lines", []):
+            if line.get("line") == self._line_id:
+                return line.get("next_bus")
+        return None
+
+    @property
+    def native_value(self) -> Any:
+        """Return the native value of the sensor: minutes until next bus."""
+        data = self.coordinator.data
         if not data:
             return None
         for line in data.get("lines", []):
