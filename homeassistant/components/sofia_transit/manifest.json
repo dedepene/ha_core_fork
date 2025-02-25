@@ -3,7 +3,7 @@
   "name": "Sofia Transit",
   "version": "1.0.0",
   "codeowners": [
-    "@yourhandle"
+    "@dedepene"
   ],
   "config_flow": true,
   "dependencies": [],
